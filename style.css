@@ -1,0 +1,54 @@
+body {
+    font-family: Rockwell;
+    font-size: 1.5em;
+    margin: 0;
+}
+
+header {
+    padding: 1vh 1vw 1vh 1vw;
+    background-color: coral;
+}
+
+main {
+    margin: 6vh 1vw 2vh 1vw;
+}
+
+main p {
+    margin-bottom: 10px;
+}
+
+.error {
+    color: red;
+}
+
+.generic {
+    display: block;
+    width: 80%;
+}
+
+span {
+    margin-right: 1vw;
+}
+
+.upload-log {
+    color: red;
+}
+
+.submit {
+    margin-top: 5vh;
+    margin-bottom: 8vh;
+    width: 200px;
+    height: 50px;
+}
+
+img {
+    margin-top: 3vh;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    background-color: rgb(242, 242, 242);
+    margin-top: 5vh;
+    padding: 15px 0 15px 0;
+}
