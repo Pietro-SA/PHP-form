@@ -43,6 +43,8 @@ span {
 
 img {
     margin-top: 3vh;
+    width: 75%;
+    height: auto;
 }
 
 footer {

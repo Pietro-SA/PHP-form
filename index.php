@@ -34,7 +34,7 @@
     </header>
     <main>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
-            <p>Nombre: </p>
+            <p>Nombre Completo: </p>
             <input type="text" class="generic" name="name">
             <span class="error">* <?php echo verify("name", "El nombre no puede estar en blanco", $name); ?></span>
             <p>Género: </p>
@@ -91,6 +91,7 @@
                             if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
                                 echo "El archivo" . htmlspecialchars( basename ($_FILES["fileToUpload"]
                                 ["name"])) . " ha sido subido.";
+                                $image = $target_file;
                             } else {
                                 echo "Lo siento, ha habido un error el la subida del archivo.";
                             }
@@ -107,47 +108,98 @@
             
             $gender = testInput($_POST["gender"]);
             $find_about_us = testInput($_POST["find_about_us"]);
+
             if ($uploadOk) {
                 $image = $target_file;
             }
 
             $servername = "localhost";
             $username = "root";
-            $password = "pAr_Ado?X8";
+            $password = "Matins";
+            $dbname = "php_form";
         
              try {
-                $conn = new PDO("mysql:host=$servername;dbname=php_form", $username, $password);
+                $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 echo "Connected successfully";
 
-                $sql = "CREATE TABLE DataCollection (
+                /*
+                $sql = "CREATE TABLE data_collection (
                     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(50) NOT NULL,
-                    gender VARCHAR(1) NOT NULL,
-                    date_birth DATE NOT NULL,
+                    full_name VARCHAR(50) NOT NULL,
+                    gender VARCHAR(10) NOT NULL,
+                    date_birth VARCHAR(10) NOT NULL,
                     country VARCHAR(30) NOT NULL,
                     find_about_us VARCHAR(70) NOT NULL,
                     reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                     )";
+                $conn->exec($sql);
+                echo "<br>Table data_collection created successfully";
+                */
 
-                    $conn->exec($sql);
-                    echo "Table DataCollection created successfully";
+                $sql = "INSERT INTO data_collection (full_name, gender, date_birth, country, find_about_us)
+                VALUES ('$name', '$gender', '$date_birth', '$country', '$find_about_us')";
+                $conn->exec($sql);
+                echo "<br>New record created successfully";
+
             } catch(PDOException $e) {
                 echo "Connection failed: " . $e->getMessage();
             }
-
             $conn = null;
         }
         ?>
 
         <h2>Muchas gracias por rellenar este formulario</h2>
         <p>Aquí tienes una copia de la información que acabas de enviarnos:</p>
-        <p><b>Nombre: </b><?php echo $name ?></p>
+        <p><b>Nombre Completo: </b><?php echo $name ?></p>
         <p><b>Género: </b><?php echo $gender ?></p>
         <p><b>Data de nacimiento: </b><?php echo $date_birth ?></p>
         <p><b>País de residencia: </b><?php echo $country ?></p>
         <p><b>¿Como te has enterado por primera vez de nosotros?: </b><?php echo $find_about_us ?></p>
+
+        <h2>Server side</h2>
         <img src="<?php echo $image ?>" alt="¡La imagen que subas se verá aqui!">
+        <div class="data-retrieved">
+            <?php
+
+            echo "<table style='border: solid 1px black;'>";
+            echo "<tr><th>Id</th><th>Firstname</th><th>Lastname</th></tr>";
+
+            class TableRows extends RecursiveIteratorIterator {
+            function __construct($it) {
+                parent::__construct($it, self::LEAVES_ONLY);
+            }
+
+            function current() {
+                return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
+            }
+
+            function beginChildren() {
+                echo "<tr>";
+            }
+
+            function endChildren() {
+                echo "</tr>" . "\n";
+            }
+            }
+
+            try {
+                $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $stmt = $conn->prepare("SELECT * FROM data_collection");
+                $stmt->execute();
+
+                $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                  echo $v;
+                }
+              } catch(PDOException $e) {
+                echo "Error: " . $e->getMessage();
+              }
+              $conn = null;
+              echo "</table>";
+            ?>
+        </div>
     </main>
     <footer>
         <?php echo date("Y"); ?> Pietro Forms
