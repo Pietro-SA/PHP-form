@@ -123,7 +123,9 @@
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 echo "Connected successfully";
 
-                
+                /*
+                ** Código para crear la tabla con sus columnas **
+
                 $sql = "CREATE TABLE data_collection (
                     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     full_name VARCHAR(50) NOT NULL,
@@ -135,7 +137,7 @@
                     )";
                 $conn->exec($sql);
                 echo "<br>Table data_collection created successfully";
-                
+                */
 
                 $sql = "INSERT INTO data_collection (full_name, gender, date_birth, country, find_about_us)
                 VALUES ('$name', '$gender', '$date_birth', '$country', '$find_about_us')";
@@ -162,7 +164,8 @@
             <?php
 
             echo "<table style='border: solid 1px black;'>";
-            echo "<tr><th>Id</th><th>Firstname</th><th>Lastname</th></tr>";
+            echo "<tr><th>id</th><th>full_name</th><th>gender</th><th>birth_date</th>
+            <th>country</th><th>find_about_us</th><th>reg_date</th></tr>";
 
             class TableRows extends RecursiveIteratorIterator {
                 function __construct($it) {
@@ -198,11 +201,6 @@
             }
             $conn = null;
             echo "</table>";
-
-            echo "<form method='post' action=borrar.php'>";
-            echo "<input type='hidden' name='id' value='" . $fila["id"] . "'>";
-            echo "<button type='submit'>Borrar</button>";
-            echo "</form>";
             ?>
         </div>
     </main>
