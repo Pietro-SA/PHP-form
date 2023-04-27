@@ -57,7 +57,7 @@
             <br>
             <p>OPCIONAL: Envíanos una foto de un paisaje natural que te encante</p><input type="file" name="fileToUpload">
             <br>
-            <div class="upload-log">
+            <div class="upload-file">
                 <?php
                     if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $target_dir = "uploads/";
@@ -104,32 +104,40 @@
         <?php
         $gender = $find_about_us = $image = "";
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+            
             $gender = testInput($_POST["gender"]);
             $find_about_us = testInput($_POST["find_about_us"]);
             if ($uploadOk) {
                 $image = $target_file;
             }
+
+            $servername = "localhost";
+            $username = "root";
+            $password = "pAr_Ado?X8";
+        
+             try {
+                $conn = new PDO("mysql:host=$servername;dbname=php_form", $username, $password);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                echo "Connected successfully";
+
+                $sql = "CREATE TABLE DataCollection (
+                    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(50) NOT NULL,
+                    gender VARCHAR(1) NOT NULL,
+                    date_birth DATE NOT NULL,
+                    country VARCHAR(30) NOT NULL,
+                    find_about_us VARCHAR(70) NOT NULL,
+                    reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    )";
+
+                    $conn->exec($sql);
+                    echo "Table DataCollection created successfully";
+            } catch(PDOException $e) {
+                echo "Connection failed: " . $e->getMessage();
+            }
+
+            $conn = null;
         }
-        /* if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (empty($_POST["name"])) {
-               $nameErr = "El nombre no puede estar en blanco";
-            } else {
-                $name = testInput($_POST["name"]);
-            }
-            $gender = testInput($_POST["gender"]);
-            if (empty($_POST["date_birth"])) {
-                $date_birthErr = "La data de nacimiento no puede estar en blanco";
-            } else {
-                $date_birth = testInput($_POST["date_birth"]);
-            }
-            if (empty($_POST["country"])) {
-                $countryErr = "EL país no puede estar en blanco";
-            } else {
-                $country = testInput($_POST["country"]);
-            }
-            $find_about_us = testInput($_POST["find_about_us"]);
-        } */
         ?>
 
         <h2>Muchas gracias por rellenar este formulario</h2>
@@ -142,7 +150,7 @@
         <img src="<?php echo $image ?>" alt="¡La imagen que subas se verá aqui!">
     </main>
     <footer>
-        2023 Pietro Forms
+        <?php echo date("Y"); ?> Pietro Forms
     </footer>
 </body>
 </html>
