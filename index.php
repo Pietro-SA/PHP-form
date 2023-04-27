@@ -115,7 +115,7 @@
 
             $servername = "localhost";
             $username = "root";
-            $password = "Matins";
+            $password = "pAr_Ado?X8";
             $dbname = "php_form";
         
              try {
@@ -123,7 +123,7 @@
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 echo "Connected successfully";
 
-                /*
+                
                 $sql = "CREATE TABLE data_collection (
                     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     full_name VARCHAR(50) NOT NULL,
@@ -135,13 +135,12 @@
                     )";
                 $conn->exec($sql);
                 echo "<br>Table data_collection created successfully";
-                */
+                
 
                 $sql = "INSERT INTO data_collection (full_name, gender, date_birth, country, find_about_us)
                 VALUES ('$name', '$gender', '$date_birth', '$country', '$find_about_us')";
                 $conn->exec($sql);
                 echo "<br>New record created successfully";
-
             } catch(PDOException $e) {
                 echo "Connection failed: " . $e->getMessage();
             }
@@ -166,26 +165,27 @@
             echo "<tr><th>Id</th><th>Firstname</th><th>Lastname</th></tr>";
 
             class TableRows extends RecursiveIteratorIterator {
-            function __construct($it) {
-                parent::__construct($it, self::LEAVES_ONLY);
-            }
+                function __construct($it) {
+                    parent::__construct($it, self::LEAVES_ONLY);
+                }
 
-            function current() {
-                return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
-            }
+                function current() {
+                    return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
+                }
 
-            function beginChildren() {
-                echo "<tr>";
-            }
+                function beginChildren() {
+                    echo "<tr>";
+                }
 
-            function endChildren() {
-                echo "</tr>" . "\n";
+                function endChildren() {
+                    echo "</tr>" . "\n";
+                }
+                
             }
-            }
-
             try {
                 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
                 $stmt = $conn->prepare("SELECT * FROM data_collection");
                 $stmt->execute();
 
@@ -193,11 +193,16 @@
                 foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
                   echo $v;
                 }
-              } catch(PDOException $e) {
+            } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
-              }
-              $conn = null;
-              echo "</table>";
+            }
+            $conn = null;
+            echo "</table>";
+
+            echo "<form method='post' action=borrar.php'>";
+            echo "<input type='hidden' name='id' value='" . $fila["id"] . "'>";
+            echo "<button type='submit'>Borrar</button>";
+            echo "</form>";
             ?>
         </div>
     </main>
