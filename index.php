@@ -9,6 +9,7 @@
 </head>
 <?php
     $name = $date_birth = $country = "";
+    $dataSent = false;
 
     function testInput($data) {
         $data = trim($data);
@@ -89,7 +90,7 @@
                             echo "Lo siento, su archivo no ha sido enviado.";
                         } else {
                             if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-                                echo "El archivo" . htmlspecialchars( basename ($_FILES["fileToUpload"]
+                                echo "El archivo " . htmlspecialchars( basename ($_FILES["fileToUpload"]
                                 ["name"])) . " ha sido subido.";
                                 $image = $target_file;
                             } else {
@@ -104,6 +105,7 @@
 
         <?php
         $gender = $find_about_us = $image = "";
+
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             $gender = testInput($_POST["gender"]);
@@ -115,9 +117,9 @@
 
             $servername = "localhost";
             $username = "root";
-            $password = "pAr_Ado?X8";
+            $password = "";
             $dbname = "php_form";
-        
+
              try {
                 $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -142,6 +144,7 @@
                 $sql = "INSERT INTO data_collection (full_name, gender, date_birth, country, find_about_us)
                 VALUES ('$name', '$gender', '$date_birth', '$country', '$find_about_us')";
                 $conn->exec($sql);
+                $dataSent = true;
                 echo "<br>New record created successfully";
             } catch(PDOException $e) {
                 echo "Connection failed: " . $e->getMessage();
@@ -163,44 +166,51 @@
         <div class="data-retrieved">
             <?php
 
-            echo "<table style='border: solid 1px black;'>";
-            echo "<tr><th>id</th><th>full_name</th><th>gender</th><th>birth_date</th>
-            <th>country</th><th>find_about_us</th><th>reg_date</th></tr>";
+            if ($dataSent) {
+                echo "<table style='border: solid 1px black;'>";
+                echo "<tr><th>id</th><th>full_name</th><th>gender</th><th>birth_date</th>
+                <th>country</th><th>find_about_us</th><th>reg_date</th></tr>";
 
-            class TableRows extends RecursiveIteratorIterator {
-                function __construct($it) {
-                    parent::__construct($it, self::LEAVES_ONLY);
-                }
+                class TableRows extends RecursiveIteratorIterator {
+                    function __construct($it) {
+                        parent::__construct($it, self::LEAVES_ONLY);
+                    }
 
-                function current() {
-                    return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
-                }
+                    function current() {
+                        return "<td style='width:150px;border:1px solid black;'>" . parent::current(). "</td>";
+                    }
 
-                function beginChildren() {
-                    echo "<tr>";
-                }
+                    function beginChildren() {
+                        echo "<tr>";
+                    }
 
-                function endChildren() {
-                    echo "</tr>" . "\n";
+                    function endChildren() {
+                        echo "</tr>" . "\n";
+                    }
+                    
                 }
                 
-            }
-            try {
-                $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                try {
+                    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                $stmt = $conn->prepare("SELECT * FROM data_collection");
-                $stmt->execute();
+                    $stmt = $conn->prepare("SELECT * FROM data_collection");
+                    $stmt->execute();
 
-                $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
-                foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
-                  echo $v;
+                    $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                    foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                    echo $v;
+                    }
+                } catch (PDOException $e) {
+                    echo "Error: " . $e->getMessage();
                 }
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
+                $conn = null;
+                echo "</table>";             
+            } else {
+                echo "<h3>Aún no hay datos.</h3>";
+                
             }
-            $conn = null;
-            echo "</table>";
+                
             ?>
         </div>
     </main>
